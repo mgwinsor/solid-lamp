@@ -9,4 +9,4 @@ if __name__ == "__main__":
 
     flights = FlightSearch()
     city = [flights.fetch_iata(city) for city in data if city["iata_code"] == ""]
-    csv_file.put_data(data)
+    csv_file.set_data(data)
