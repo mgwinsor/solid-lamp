@@ -8,5 +8,6 @@ if __name__ == "__main__":
     data = csv_file.get_data()
 
     flights = FlightSearch()
+    flights.get_new_token()
     city = [flights.fetch_iata(city) for city in data if city["iata_code"] == ""]
     csv_file.set_data(data)

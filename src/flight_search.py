@@ -13,9 +13,9 @@ class FlightSearch:
         load_dotenv()
         self._api_key = os.getenv("AMADEUS_API_KEY")
         self._api_secret = os.getenv("AMADEUS_API_SECRET")
-        self._token = self._get_new_token()
+        self._token: str = None
 
-    def _get_new_token(self):
+    def get_new_token(self) -> None:
         header = {"Content-Type": "application/x-www-form-urlencoded"}
         body = {
             "grant_type": "client_credentials",
@@ -27,9 +27,24 @@ class FlightSearch:
             headers=header,
             data=body,
         )
-        print(response.json()["access_token"])
-        return response.json()["access_token"]
+        self._token = response.json()["access_token"]
 
-    def fetch_iata(self, city_data: dict) -> dict:
-        city_data["iata_code"] = "TESTING"
+    def fetch_iata(self, city_data: list[dict]) -> list[dict]:
+        headers = {
+            "accept": "application/vnd.amadeus+json",
+            "Authorization": f"Bearer f{self._token}",
+        }
+        for city in city_data:
+            body = {
+                "keyword": city["city"],
+                "max": 1,
+                "include": "AIRPORTS",
+            }
+            response = requests.get(
+                FlightSearch.CITY_ENDPOINT,
+                headers=headers,
+                data=body,
+            )
+            iata_code = response.json()["data"][0]["iataCode"]
+            city["iata_code"] = iata_code
         return city_data
