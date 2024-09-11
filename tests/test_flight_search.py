@@ -12,11 +12,7 @@ def mock_env_vars(monkeypatch):
 
 @pytest.fixture
 def flight_deal_data():
-    return [
-        {"city": "Paris", "iata_code": "", "lowest_price": 54},
-        {"city": "Tokyo", "iata_code": "", "lowest_price": 485},
-        {"city": "Hong Kong", "iata_code": "", "lowest_price": 551},
-    ]
+    return {"city": "Paris", "iata_code": "", "lowest_price": 54}
 
 
 @pytest.fixture
@@ -38,17 +34,27 @@ def test_get_new_token(flight_search):
 
 
 def test_get_iata(flight_search, flight_deal_data):
+    expected_headers = {
+        "accept": "application/vnd.amadeus+json",
+        "Authorization": f"Bearer {flight_search._token}",
+    }
     mock_response = {
         "data": [
             {"name": "Paris", "iataCode": "PAR"},
         ],
     }
+
     with requests_mock.Mocker() as mock:
-        mock.get(FlightSearch.CITY_ENDPOINT, json=mock_response)
-    expected = [
-        {"city": "Paris", "iata_code": "PAR", "lowest_price": 54},
-        {"city": "Tokyo", "iata_code": "TYO", "lowest_price": 485},
-        {"city": "Hong Kong", "iata_code": "HKG", "lowest_price": 551},
-    ]
-    result = flight_search.fetch_iata(flight_deal_data)
+        mock.get(
+            FlightSearch.CITY_ENDPOINT,
+            headers=expected_headers,
+            json=mock_response,
+        )
+        result = flight_search.fetch_iata(flight_deal_data)
+        request_headers = mock.last_request.headers
+
+    assert request_headers["accept"] == expected_headers["accept"]
+    assert request_headers["Authorization"] == expected_headers["Authorization"]
+
+    expected = {"city": "Paris", "iata_code": "PAR", "lowest_price": 54}
     assert result == expected
