@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 
 from data_manager import DataManager
@@ -9,5 +10,7 @@ if __name__ == "__main__":
 
     flights = FlightSearch()
     flights.get_new_token()
-    city = [flights.fetch_iata(city) for city in data if city["iata_code"] == ""]
+    for row in data:
+        row["iata_code"] = flights.fetch_iata(city_name=row["city"])
+        time.sleep(2)
     csv_file.set_data(data)

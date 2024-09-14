@@ -1,10 +1,10 @@
 city,iata_code,lowest_price
-Paris,TESTING,54
-Frankfurt,TESTING,42
-Tokyo,TESTING,485
-Hong Kong,TESTING,551
-Istanbul,TESTING,95
-Kuala Lumpur,TESTING,414
-New York,TESTING,240
-San Francisco,TESTING,260
-Dublin,TESTING,378
+Paris,PAR,54
+Frankfurt,FRA,42
+Tokyo,TYO,485
+Hong Kong,HKG,551
+Istanbul,IST,95
+Kuala Lumpur,KUL,414
+New York,NYC,240
+San Francisco,SFO,260
+Dublin,DBN,378

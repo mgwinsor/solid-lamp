@@ -29,23 +29,27 @@ class FlightSearch:
         )
         self._token = response.json()["access_token"]
 
-    def fetch_iata(self, city_data: dict) -> dict:
-        headers = {
-            "accept": "application/vnd.amadeus+json",
-            "Authorization": f"Bearer {self._token}",
-        }
+    def fetch_iata(self, city_name) -> dict:
+        headers = {"Authorization": f"Bearer {self._token}"}
         body = {
-            "keyword": city_data["city"],
+            "keyword": city_name,
             "max": 1,
             "include": "AIRPORTS",
         }
         response = requests.get(
             url=FlightSearch.CITY_ENDPOINT,
             headers=headers,
-            data=body,
+            params=body,
         )
 
-        iata_code = response.json()["data"][0]["iataCode"]
-        city_data["iata_code"] = iata_code
+        print(f"Status code {response.status_code}. Airport IATA: {response.text}")
+        try:
+            iata_code = response.json()["data"][0]["iataCode"]
+        except IndexError:
+            print(f"IndexError: No airport code found for {city_name}.")
+            return "N/A"
+        except KeyError:
+            print(f"KeyError: No airport code found for {city_name}.")
+            return "Not Found"
 
-        return city_data
+        return iata_code

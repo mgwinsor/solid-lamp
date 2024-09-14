@@ -11,8 +11,8 @@ def mock_env_vars(monkeypatch):
 
 
 @pytest.fixture
-def flight_deal_data():
-    return {"city": "Paris", "iata_code": "", "lowest_price": 54}
+def city_name_data():
+    return "Paris"
 
 
 @pytest.fixture
@@ -33,9 +33,8 @@ def test_get_new_token(flight_search):
         assert flight_search._token == "mock_token"
 
 
-def test_get_iata(flight_search, flight_deal_data):
+def test_get_iata(flight_search, city_name_data):
     expected_headers = {
-        "accept": "application/vnd.amadeus+json",
         "Authorization": f"Bearer {flight_search._token}",
     }
     mock_response = {
@@ -46,15 +45,14 @@ def test_get_iata(flight_search, flight_deal_data):
 
     with requests_mock.Mocker() as mock:
         mock.get(
-            FlightSearch.CITY_ENDPOINT,
+            url=FlightSearch.CITY_ENDPOINT,
             headers=expected_headers,
             json=mock_response,
         )
-        result = flight_search.fetch_iata(flight_deal_data)
+        result = flight_search.fetch_iata(city_name_data)
         request_headers = mock.last_request.headers
 
-    assert request_headers["accept"] == expected_headers["accept"]
     assert request_headers["Authorization"] == expected_headers["Authorization"]
 
-    expected = {"city": "Paris", "iata_code": "PAR", "lowest_price": 54}
+    expected = "PAR"
     assert result == expected
